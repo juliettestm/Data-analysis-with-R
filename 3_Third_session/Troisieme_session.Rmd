@@ -1,0 +1,340 @@
+---
+title: "Untitled"
+output: html_document
+date: "2025-10-01"
+---
+
+# Part 1: Simple Exercises
+
+## Exercise 1: Selecting Specific Columns with select()
+
+1.Load the iris dataset
+
+2\. Create a new data frame called Petal.Width , and iris_petal that contains only the Petal.Length , Species columns using the select() method
+
+```{r}
+library(tidyverse)
+iris
+iris_petal=select(iris,Petal.Length,Petal.Width,Species)
+iris_petal
+```
+
+3\. Display the first 6 rows of your new iris_petal data frame
+
+```{r}
+head(iris_petal)
+```
+
+## Exercise 2: Filtering Rows with filter()
+
+1\. Load the mtcars dataset. 2. Create a new data frame called powerful_cars that contains only the cars with horsepower (hp ) greater than 200.
+
+```{r}
+mtcars
+powerful_cars=filter(mtcars,hp>200)
+powerful_cars
+```
+
+3\. How many cars are in the powerful_cars data frame
+
+```{r}
+nrow(powerful_cars)
+```
+
+## Exercise 3: Sorting a Data Frame with arrange()
+
+1\. Create a new data frame called iris_sorted by arranging the iris dataset by Sepal.Length in descending order.
+
+```{r}
+iris_sorted=iris %>% arrange(desc(Sepal.Length))
+iris_sorted
+```
+
+2\. Display the top 5 rows of iris_sorted to see the flowers with the longest sepals
+
+```{r}
+head(iris_sorted,5)
+```
+
+3.Now, create another data frame iris_sorted_asc arranged by Sepal.Length in ascending order and display its top 5 rows.
+
+```{r}
+iris_sorted_asc=iris %>% arrange(Sepal.Length) %>% head(5)
+iris_sorted_asc
+```
+
+## Exercise 4: Creating a New Column with mutate()
+
+1.Create a new data frame called mtcars_metric . 2. Add a new column to it called wt_kg which is the 453.592 (since wt column multiplied by wt is in 1000s of lbs, this is a simplification).
+
+```{r}
+mtcars_metric=mtcars %>% mutate(wt_kg=wt*453.592)
+mtcars_metric
+```
+
+3\. Display the mpg , wt , and the new wt_kg columns for the first 5 cars
+
+```{r}
+select(mtcars_metric,mpg,wt,wt_kg)%>% head(5)
+```
+
+## Exercise 5: Combining filter() and select() with the Pipe %\>%
+
+1.Using the pipe ( %\>% ), start with the iris dataset
+
+2.First, filter the data to include only the rows where
+
+3\. Then, select only the Petal.Length and Petal.Width columns.
+
+4.Store the result in a data frame called virginica_petals and display it.
+
+```{r}
+virginica_petals=iris %>% filter(Species=="virginica") %>% select(starts_with("Petal"))
+virginica_petals
+```
+
+## Exercise 6: Basic Grouping with group_by() and summarise()
+
+1\. Start with the iris dataset.
+
+2.Use group_by() to group the data by the
+
+3.Use Species column.summarise() to calculate the mean of Sepal.Length for each species. Name the new summary column avg_sepal_length .
+
+4\. Store the result in species_avg_sepal and display it.
+
+```{r}
+species_avg_sepal=iris %>% group_by(Species) %>% summarise(avg_sepal_length=mean(Sepal.Length))
+species_avg_sepal
+```
+
+## Exercise 7: Using apply() on Numeric Data
+
+1\. Create a new data frame iris_numeric that contains only the first four (numeric) columns of the iris dataset.
+
+2.Use the apply() function on iris_numeric to calculate the mean of each column. Hint: The second argument to apply() should be 2 to specify columns
+
+3.Display the resulting vector of means
+
+```{r}
+iris_numeric=iris[,-5] %>% apply(2, mean)
+iris_numeric
+```
+
+## Exercise 8: Basic Aggregation with aggregate()
+
+1.Use the aggregate() function.
+
+2.The first argument should be the column you want to summarize (mtcars\$hp ).
+
+3.The second argument should be a list of grouping variables (in this case, list(cylinder_type = mtcars\$cyl) ). 4.The third argument should be the function to apply ( 5.Display the result
+
+```{r}
+aggregate(mtcars$hp,list(cylinder_type = mtcars$cyl), mean)
+```
+
+## Exercise 9: Using the by() Function
+
+1.Use the by() function. 2.The first argument should be the data vector to be summarized 3.The second argument should be the grouping factor 4.The third argument should be the function to apply 5.Display the result.
+
+```{r}
+by(mtcars$mpg ,mtcars$gear,summary)
+```
+
+## Exercise 10: A Simple dplyr Chain
+
+1.Start with the mtcars dataset and the pipe (%% ). 2.filter() for cars where cyl is 4 AND mpg is greater than 25. 3.Use summarise() to calculate the mean() of the hp column 4.Display the result.
+
+```{r}
+mtcars %>% filter(cyl==4 & mpg>25) %>% summarise(mean_hp=mean(hp))
+
+```
+
+# Part 2: Complicated Exercises
+
+## Exercise 11: Advanced Filtering and Selection
+
+```{r}
+specific_characters=starwars %>% filter(species!= "Human" & ( homeworld %in% c("Tatooine","Naboo") )& height>100 ) %>% select(name,species,homeworld,height)
+specific_characters
+case_when
+```
+
+## Exercise 12: Conditional Column Creation with mutate() and
+
+case_when()
+
+```{r}
+airquality %>% mutate(season)
+```
+
+## Exercise 15: Advanced aggregate() with a Formula
+
+### Context:
+
+Using the mtcars dataset, calculate both the mean and standard deviation of mpg and hp , grouped by both
+
+### Tasks:
+
+1\. Use the aggregate() function with its formula interface.
+
+2\. The formula should group mpg and hp by cyl and gear (Hint: cbind(mpg, hp) \~ cyl +gear ) 3. The data argument is mtcars
+
+4.The function argument should calculate both mean and standard deviation. This is tricky. A common way is to apply a function that returns a vector, like function(x) c(mean = mean(x), sd = sd(x))
+
+```{r echo=FALSE}
+
+ad_aggregate=aggregate(cbind(mpg, hp) ~ cyl + gear, mtcars,function(x) c(mean = mean(x), sd = sd(x))) #forme des sous tableaux de moyenne et d'écart type pour mpg et hp
+ad_aggregate
+```
+#### Explication:  La fonction aggregate a permit de calculer la moyenne et l'écart type sur mpg et hp par cyl et gear cela affiche le résultat sur Knit mais pas sur le .rmd car ce sont des sous tableaux que l'on doit regrouper en data frame
+
+
+## Exercise 16: Comparing by() with a dplyr Chain
+
+### Context:
+
+Find the median horsepower ( hp ) for each number of carburetors (carb) in the mtcars dataset. Solve this problem in two different ways.
+
+### Tasks:
+
+1\. Method 1 (Base R) Use the by() function to apply the median() function to the hp column, grouped by the carb column.
+
+```{r echo=FALSE}
+base_R=by(mtcars$hp,mtcars$carb,median) # tout est regroupé en une fonction
+```
+
+2.Method 2 (Tidyverse): Use a dplyr chain. Start with mtcars,group_by(carb) and then summarise(median_hp = median(hp)) .
+
+```{r echo=FALSE}
+
+dplyr=mtcars %>% group_by(carb) %>% summarise(median_hp = median(hp)) # on voit les étapes
+```
+
+3.Display the results from both methods and observe the difference in their output format.
+
+```{r echo=FALSE}
+base_R # Affichage
+dplyr
+```
+
+#### Difference : En R les résultats sont afficher un par un par nombre de carb tandis qu'avec dplyr c'est sous forme d'un tableau ce qui est mieux pour les comparaisons
+
+
+
+##  Exercise 17: Full Data Pipeline - Finding the Hottest Day
+
+### Context: 
+
+In the airquality dataset, find the date Month and Day) with the highest 
+temperature. Also, include the Wind and Ozone values for that day.
+
+### Tasks:
+
+1\.Start with the airquality dataset
+
+2\. Use arrange() to sort the entire dataset by Temp in descending order.
+
+3\.Use head(1) to select the top row, which will be the hottest day
+
+4\. select() the Month , Day , Temp , Wind , and Ozone columns.
+```{r echo=FALSE}
+result=airquality %>% arrange(desc(Temp)) %>% head(1) %>% select(Month,Day,Temp,Wind,Ozone) # Le jour le plus chaud
+
+```
+
+
+5\. Display the final one-row data frame.
+```{r echo=FALSE}
+result # affichage
+```
+
+#### Explication: On souhaite obtenir le jour le plus chaud on réarrange pour le trouver on le choisit et on selectionne ce qu'on veut afficher
+
+
+## Exercise 18: Full Data Pipeline - Character Analysis
+
+### Context:
+
+Find the three heaviest characters for each gender in the starwars dataset. Exclude characters with unknown mass or gender.
+
+### Tasks:
+
+1\.Start with the starwars dataset.
+
+2\.filter() out any rows where mass or gender is NA 
+
+3\.group_by() the gender column.
+
+4\.arrange() the data by mass in descending order within each group
+
+5\.Use slice_head(n = 3 to select the top 3 rows from each gender group
+
+6\.select() the name , gender , and mass columns to display the result clearly
+
+```{r echo=FALSE}
+starwars %>% filter (!is.na(mass),!is.na(gender)) %>% group_by(gender) %>% arrange(desc(mass)) %>% slice_head(n=3) %>% select(name,gender,mass)  # Regrouper par genre et afficher les poids les plus élevé pour chaque genre
+```
+#### Explication: On enlève les personnage qui n'ont pas de poids et de genre on reorganise par genre puis on classe par descendant et on choisi les 3 premiers de chaque genre et on selectionne nom,genre et poids
+
+
+
+## Exercise 19: Combining Base R aggregate with dplyr
+
+### Context:
+
+First, calculate the average mpg for each cyl and am (transmission type) combination using aggregate . Then, use dplyr to rename the columns and filter for only the combinations with an average mpg over 20
+
+### Tasks:
+
+1\. Use aggregate() with the formula mpg ~ cyl + am on the mtcars dataset with the mean
+function. Store the result in agg_result 
+
+2\.Convert agg_result into a tibble using as_tibble() 
+
+3\.Use a dplyr pipe ( %>% ) on the tibble
+
+4\. Use mtcars dataset with the rename(avg_mpg = mpg) to make the column name more descriptive.
+
+5\.filter() the results to keep only rows where avg_mpg is greater than 20.
+
+6\.Display the final, cleaned-up summary table.
+```{r echo=FALSE}
+agg_result=aggregate(mpg ~ cyl + am,mtcars,mean)# calcul de la moyenne
+as_tibble(agg_result) %>% rename(avg_mpg = mpg) %>% filter(avg_mpg>20) # filtrage de la moyenne avec les moyennes supérieur a 20
+```
+
+#### Explication: Permet de calculer la moyenne de mpg par cyl et am, on renomme la colonne et on filtre a la moyenne superieur a 20
+
+
+## Exercise 20: Open Problem Solving
+
+### Context:
+
+First, calculate the average mpg for each cyl and am (transmission type) combination using aggregate . Then, use dplyr to rename the columns and filter for only the combinations with an average mpg over 20
+
+### Tasks
+
+1\.Start with the starwars dataset
+
+2\. First, identify the three most common species. Hint:count(species, sort = TRUE) and head(3) ).
+```{r echo=FALSE}
+starwars %>% count(species, sort =TRUE) %>% head(3)  # Identifié les espèces les plus nombreuses
+```
+#### On choisi les espèces les plus nombreuses
+
+3\. filter() the originalstarwars dataset to keep only the characters belonging to those top three species.
+
+4\.Use mutate() to calculate two new columns: height_m (height in meters) and bmi
+
+5\.group_by() species.
+
+6\.summarise() to find the avg_bmi = mean(bmi, na.rm = TRUE) .
+
+7\.Display the final result.
+
+```{r echo=FALSE}
+starwars %>% filter(species %in% c("Human","Droid",NA)) %>% mutate(height_m=height/100,bmi=mass/(height_m*height_m)) %>% group_by(species) %>% summarise(avg_bmi = mean(bmi, na.rm = TRUE)) # reprendre les espèces d'avant et caluler son IMC afficher la moyenne des IMC des espèces regroupé
+```
+
+#### Explication: Pour calculer la moyenne de l'IMC on prend les 3 espèces les plus nombreuses puis on  rajouter les colonnes tailles en mètre et l'IMC en caluant IMC= mass/(taille_m)^2

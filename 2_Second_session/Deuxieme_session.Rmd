@@ -1,0 +1,190 @@
+---
+title: "Deuxieme_session"
+output: html_document
+date: "2025-09-24"
+---
+
+# Part 1: [Warm-up] Foundational Operations & Transformations
+
+## Exercise 1: Personal Finance Calculator
+
+```{r}
+expenses=c(85.50, 210.00, 45.25, 120.75)
+total_expenses=sum(expenses)
+user_name="Maria"
+summary_message=paste0(user_name,", your total expenses for the month are: ", total_expenses)
+summary_message
+```
+
+## Exercise 2: Sales Performance Matrix
+
+```{r}
+sales_data=c(250, 300, 210, 400, 550, 420, 180, 220, 190, 310, 330, 290)
+sales_matrix=matrix(sales_data,nrow=4,ncol = 3,byrow=TRUE)
+rownames(sales_matrix)=c("Product A", "Product B", "Product C","Product D")
+colnames(sales_matrix)=c("North", "South", "West")
+sales_matrix
+total_productC=sum(sales_matrix[3,])
+total_productC
+total_West=sum(sales_matrix[,3])
+total_West
+Highest_product=which.max(rowSums(sales_matrix))
+Highest_product
+average_sales_per_product=rowMeans(sales_matrix)
+average_sales_per_product
+
+```
+
+## Exercise 3: Weather Data Cleanup and Transformation
+
+```{r}
+weather_df=read.csv("weather_data.csv",na.strings = "NA")
+weather_df
+wind_speed_clean=weather_df$WindSpeed_MPH
+weather_df=cbind(weather_df,wind_speed_clean)
+weather_df$wind_speed_clean=gsub("mph","",weather_df$wind_speed_clean)
+weather_df
+weather_df$wind_speed_clean=as.integer(weather_df$wind_speed_clean)
+weather_df
+temperature_c=(weather_df$Temperature_F-32)*5/9
+weather_df=cbind(weather_df,temperature_c)
+weather_df
+rain=weather_df[(weather_df$Event=="Rain"),] # attention il faut ajouter une virgule pour que cela fonctionne
+rain
+temp_mean_Rain=mean(rain$temperature_c)
+temp_mean_Rain
+```
+
+# Part 2: [NEW] Data Frames - Simple Access and Filters
+
+## Exercise 4: Basic Data Frame Inspection
+
+```{r}
+head(mtcars)
+dim(mtcars)
+colnames(mtcars)
+mtcars$mpg
+
+```
+
+## Exercise 5: Single-Condition Filtering
+
+```{r}
+six_cyl_cars=mtcars[(mtcars$cyl == 6),] #attention virgule
+six_cyl_cars
+nrow(six_cyl_cars)
+efficient_cars=mtcars[(mtcars$mpg>= 25),]
+efficient_cars
+```
+
+## Exercise 6: Multi-Condition Filtering
+
+```{r}
+powerful_and_efficient=mtcars[(mtcars$hp>150) & (mtcars$mpg>14),]
+powerful_and_efficient
+nrow(powerful_and_efficient)
+
+light_or_fast=mtcars[(mtcars$wt<2) | (mtcars$qsec<16),]
+light_or_fast
+
+powerful_and_efficient[c("mpg","hp","wt"),]
+```
+
+## Exercise 7: Filtering with a Set of Values
+
+1.Create a data frame named four_or_six_cyl that contains all cars from mtcars that have either 4 or 6 cylinders. Use the %in% operator for this.
+
+```{r}
+four_or_six_cyl=mtcars[mtcars$cyl %in% c(4,6),]
+four_or_six_cyl # Toute les voitures qui on 4 ou 6 cylindres
+```
+
+2.Create a vector of car names you are interested in: target_cars ← c("Mazda RX4", "Honda Civic", "Ford Pantera L")
+
+```{r}
+target_cars=c("Mazda RX4", "Honda Civic", "Ford Pantera L")
+target_cars # Creer un vecteur pour selectionner certaines voitures
+```
+
+3.Create a new data frame my_favorite_cars that contains only the rows from mtcars corresponding to the names in target_cars . Hint: car names are the row names of mtcars )
+
+```{r}
+my_favorite_cars=mtcars[rownames(mtcars) %in% target_cars,]
+my_favorite_cars # Toutes les lignes comportant soit la voiture Mazda RX4, Honda Civic ou Ford Pantera L
+```
+
+4.How many cars in the dataset have a number of forward gears NOT 3 or 5
+
+```{r}
+nb_fowards_gear=sum(!(mtcars$gear %in% c(3,5)))
+nb_fowards_gear #La somme des voitures qui ne contiennent pas 3 ou 5 gear
+```
+
+## Exercise 8: Handling Missing Data
+
+1\. Using the iris_with_na data frame, find the total number of NA values in the entire dataset. Hint: is.na() and sum()
+
+```{r}
+ # Setup: Create the data frame with NA values
+ iris_with_na<- iris
+ # Manually insert some NA values for the exercise
+ iris_with_na[1, 1] <- NA  # Set Sepal.Length of row 1 to NA
+ iris_with_na[2, 3] <- NA
+ 
+sum(is.na(iris_with_na))#la somme des NA dans iris_with_na
+```
+
+2\. Create a new data frame called clean_iris that contains only the rows from iris_with_na that have no missing values at all. Hint: complete.cases() )
+
+```{r}
+ 
+clean_iris=iris_with_na[complete.cases(iris_with_na),]
+clean_iris # prendre les lignes qui ne contiennent pas de NA 
+```
+
+3.Verify that clean_iris has no missing values.
+
+```{r}
+any(is.na(clean_iris)) # Verifier si dans clean iris il n'y a pas de NA
+```
+
+4.Calculate the mean of the Sepal.Length column in the original frame. You will need to tell the iris_with_na data mean() function to ignore the NA values. Hint: check the help file for mean ).
+
+```{r}
+?mean
+mean_sepal=mean(iris_with_na$Sepal.Length, na.rm = TRUE)
+mean_sepal # Calculer la moyenne des sepal en ne prenant pas en compte les NA
+```
+
+# Part 3: Data Frames & Tidyverse Methods
+
+## Exercise 9: (Simple) - Selecting and Filtering Data
+
+1\. Load the starwars dataset
+
+```{r}
+library(dplyr) # importer la librairies
+starwars # télécharger les données
+```
+
+2.  Create a new tibble (a modern data frame) called jedi_characters that contains only the characters from the "Jedi" order. Hint: this information is not directly available, so filter for characters whose name is "Luke Skywalker", "Anakin Skywalker", or "Obi-Wan Kenobi").
+
+```{r}
+jedi_characters=filter(starwars,name %in% c("Luke Skywalker", "Anakin Skywalker", "Obi-Wan Kenobi"))
+jedi_characters # Selectionne les Jedis
+
+```
+
+3.From the full starwars dataset, create a new tibble that includes only the name height , and mass columns
+
+```{r}
+height_mass=select(starwars, name,height, mass)
+height_mass # afiche la taille et la masse
+```
+
+4.Combine these two operations: create a tibble that contains the name homeworld , and species for all droids
+
+```{r}
+droids=starwars %>% filter(species=="Droid") %>% select(name,homeworld,species)
+droids # Afficher les droides leur monde 
+```
