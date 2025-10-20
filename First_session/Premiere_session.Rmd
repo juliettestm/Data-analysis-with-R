@@ -1,0 +1,102 @@
+---
+title: "Premiere_session"
+output: html_document
+---
+
+# Part 1: Basic Operations with Numbers and Strings
+
+## Exercice 1 : The Online Store Calculator
+
+```{r}
+item_price=150
+item_quantity=3
+subtotal=item_price*item_quantity
+discount_amount=subtotal*0.2
+discounted_total=subtotal-discount_amount
+tax_amount=discounted_total*0.05
+final_price=discounted_total+tax_amount
+final_price
+```
+
+## Exercice 2: Creating User Profiles
+
+```{r}
+first_name="Alex"
+last_name="Doe"
+full_name=paste(first_name,last_name )
+welcome_message=paste("Welcome",full_name,"!")
+username=paste0(substr(full_name,1,1),last_name)
+username
+welcome_message
+```
+
+# Part 2: Operations with Vectors and Matrices
+
+## Exercice 3: Analizing student grades
+
+```{r}
+grades=c(88, 92, 85, 74, 95, 68, 85, 89, 91, 85)
+average_grade=mean(grades)
+average_grade
+highest_grade=max(grades)
+highest_grade
+lowest_grades=min(grades)
+lowest_grades
+students=length(grades)
+students
+best_student=grades>=90
+grades[best_student]
+equal=grades== 85
+student_85=length(grades[equal])
+student_85
+```
+
+## Exercise 4: Monthly Sales Report
+
+```{r}
+sales= c(5000, 5500, 4800, 6200, 7000)
+expenses= c(2200, 2400, 2100, 2800, 3100)
+profit=sales-expenses
+profit
+total_profit=sum(profit)
+total_profit
+average_profit=mean(profit)
+average_profit
+highest_profit=which.max(profit)
+highest_profit
+```
+
+## Exercise 5: Store Inventory Management
+
+```{r}
+inventory_data=c(25, 150, 75, 40, 200, 110, 30, 180, 90, 55, 220, 130)
+inventory_matrix=matrix(inventory_data, nrow=3, byrow=TRUE)
+inventory_matrix
+inventory_matrix[2,3]
+inventory_matrix[,4]
+total_A=sum(inventory_matrix[1,])
+total_A
+highest_stockC=which.max(inventory_matrix[3,])
+highest_stockC
+```
+
+# Part 3: Reading CSV and Applying Transformations
+
+## Exercise 6: Analyzing Employee Data
+
+```{r}
+employees_df=read.csv("employees.csv")
+employees_df
+first_rows=head(employees_df,2)
+first_rows
+collumns=str(employees_df)
+average=mean(employees_df$salary_usd)
+average
+salary_eur=employees_df$salary_usd*0.92
+salary_eur
+employees_df=cbind(employees_df,salary_eur)
+employees_df
+it_employees_df=employees_df[employees_df$department=="IT",]
+it_employees_df
+```
+
